@@ -3,8 +3,8 @@
   "subtitle": "Acompanhamento semanal do backlog",
   "logo": "logo.jpg",
   "colors": {
-    "primary": "#0f766e",
-    "secondary": "#f59e0b"
+    "primary": "#3b4ba8",
+    "secondary": "#f0876a"
   },
   "sections": ["kpis", "mensal", "paradas", "labels", "responsaveis", "antigas", "comentadas"],
   "css": "report.css",
