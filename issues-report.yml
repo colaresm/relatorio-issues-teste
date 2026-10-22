@@ -1,0 +1,71 @@
+# Salvar em: .github/workflows/issues-report.yml
+#
+# Estrutura esperada no repositório:
+#   github_issues_report.py
+#   report.config.json        (opcional – customização)
+#   report.css                (opcional – CSS extra referenciado no config)
+#   report-assets/            (opcional – logo e outras imagens, copiadas para o site)
+#
+# Antes da 1ª execução: Settings → Pages → Build and deployment → Source: "GitHub Actions"
+name: Relatório de Issues
+
+on:
+  schedule:
+    - cron: "0 11 * * 1"      # toda segunda às 08:00 de Fortaleza (11:00 UTC)
+  workflow_dispatch:          # botão "Run workflow" para rodar manualmente
+    inputs:
+      state:
+        description: "Estado das issues"
+        default: "all"
+        type: choice
+        options: [all, open, closed]
+
+permissions:
+  issues: read
+  contents: read
+  pages: write        # publicar no GitHub Pages
+  id-token: write     # exigido pelo deploy-pages
+
+concurrency:          # evita dois deploys simultâneos
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests
+
+      - name: Gerar relatório
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CONFIG=""
+          [ -f report.config.json ] && CONFIG="--config report.config.json"
+          python github_issues_report.py "${{ github.repository }}" \
+            --state "${{ inputs.state || 'all' }}" \
+            $CONFIG -o site/index
+          [ -d report-assets ] && cp -r report-assets/. site/ || true
+
+      - name: Mostrar relatório na página da execução
+        run: cat site/index.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
