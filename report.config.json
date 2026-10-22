@@ -1,12 +1,12 @@
 {
-  "title": "Painel de Issues — Plataforma de Simulação",
+  "title": "Painel de Issues",
   "subtitle": "Acompanhamento semanal do backlog",
-  "logo": "logo.png",
+  "logo": "logo.jpg",
   "colors": {
     "primary": "#0f766e",
     "secondary": "#f59e0b"
   },
   "sections": ["kpis", "mensal", "paradas", "labels", "responsaveis", "antigas", "comentadas"],
   "css": "report.css",
-  "footer": "Gerado automaticamente pelo GitHub Actions toda segunda-feira."
+  "footer": "Gerado automaticamente pelo GitHub Actions "
 }
